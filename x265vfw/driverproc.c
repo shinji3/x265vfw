@@ -89,6 +89,7 @@ static void log_callback(void *ptr, int level, const char *fmt, va_list vl)
 LRESULT WINAPI attribute_align_arg DriverProc(DWORD_PTR dwDriverId, HDRVR hDriver, UINT uMsg, LPARAM lParam1, LPARAM lParam2)
 {
     CODEC *codec = (CODEC *)dwDriverId;
+    ICDECOMPRESSEX *px;
 
     switch (uMsg)
     {
@@ -286,6 +287,34 @@ LRESULT WINAPI attribute_align_arg DriverProc(DWORD_PTR dwDriverId, HDRVR hDrive
                 return ICERR_UNSUPPORTED;
 
         case ICM_DECOMPRESS_END:
+            if (codec->decoder_enabled)
+                return x264vfw_decompress_end(codec);
+            else
+                return ICERR_UNSUPPORTED;
+
+        case ICM_DECOMPRESSEX_QUERY:
+            if (codec->decoder_enabled) {
+                px = (ICDECOMPRESSEX *)lParam1;
+                return x264vfw_decompress_query(codec, (BITMAPINFO *)px->lpbiSrc, (BITMAPINFO *)px->lpbiDst);
+            } else {
+                return ICERR_UNSUPPORTED;
+            }
+
+        case ICM_DECOMPRESSEX_BEGIN:
+            if (codec->decoder_enabled) {
+                px = (ICDECOMPRESSEX *)lParam1;
+                return x264vfw_decompress_begin(codec, (BITMAPINFO *)px->lpbiSrc, (BITMAPINFO *)px->lpbiDst);
+            } else {
+                return ICERR_UNSUPPORTED;
+            }
+
+        case ICM_DECOMPRESSEX:
+            if (codec->decoder_enabled)
+                return x264vfw_decompress(codec, (ICDECOMPRESS *)lParam1);
+            else
+                return ICERR_UNSUPPORTED;
+
+        case ICM_DECOMPRESSEX_END:
             if (codec->decoder_enabled)
                 return x264vfw_decompress_end(codec);
             else
