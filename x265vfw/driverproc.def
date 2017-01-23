@@ -1,0 +1,7 @@
+; DriverProc.def : Declares the module parameters for the DLL.
+
+DESCRIPTION 'x265vfw - H.265/MPEG-H codec'
+
+EXPORTS
+	DriverProc
+	Configure
