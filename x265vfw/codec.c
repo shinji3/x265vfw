@@ -2134,7 +2134,7 @@ LRESULT x264vfw_decompress_begin(CODEC *codec, BITMAPINFO *lpbiInput, BITMAPINFO
         return ICERR_ERROR;
     }
 
-    codec->decoder_context->thread_count = 1; //minimize latency
+    codec->decoder_context->thread_count = 0; //minimize latency
     codec->decoder_context->coded_width  = lpbiInput->bmiHeader.biWidth;
     codec->decoder_context->coded_height = lpbiInput->bmiHeader.biHeight;
     codec->decoder_context->codec_tag = lpbiInput->bmiHeader.biCompression;
