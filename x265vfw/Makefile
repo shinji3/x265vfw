@@ -122,33 +122,6 @@ ifneq ($(wildcard config.h)x,x)
 CONFIG := $(shell cat config.h)
 endif
 
-SRCS_LSMASH = common/alloc.c common/bits.c common/bytes.c common/list.c \
-              common/multibuf.c common/osdep.c common/utils.c \
-              codecs/a52.c codecs/alac.c codecs/description.c codecs/dts.c \
-              codecs/h264.c codecs/hevc.c codecs/id.c codecs/mp4sys.c \
-              codecs/mp4a.c codecs/mp4v.c codecs/nalu.c codecs/qt_wfex.c \
-              codecs/vc1.c codecs/wma.c \
-              importer/a52_imp.c importer/adts_imp.c importer/als_imp.c \
-              importer/amr_imp.c importer/dts_imp.c importer/importer.c \
-              importer/isobm_imp.c importer/mp3_imp.c importer/nalu_imp.c \
-              importer/vc1_imp.c importer/wave_imp.c \
-              core/box.c core/chapter.c core/file.c core/fragment.c \
-              core/isom.c core/meta.c core/print.c core/read.c \
-              core/summary.c core/timeline.c core/write.c
-
-CFLAGS += -Ioutput/L-SMASH
-
-#TODO: fix file output writers
-#SRC_C += output/raw.c
-#SRC_C += output/matroska.c output/matroska_ebml.c
-#SRC_C += output/flv.c output/flv_bytestream.c
-#SRC_C += output/mp4_lsmash.c
-#SRC_C += $(addprefix output/L-SMASH/, $(SRCS_LSMASH))
-
-ifeq ($(HAVE_FFMPEG),yes)
-#SRC_C += output/avi.c
-endif
-
 # MinGW64 bugfix
 ifeq ($(SYS_ARCH),X86_64)
 VFW_LDFLAGS += -liconv
