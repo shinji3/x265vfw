@@ -36,7 +36,6 @@
 #include <windows.h>
 #include <wchar.h>
 
-#include <x265.h>
 #include "config.h"
 
 #ifdef HAVE_STDINT_H

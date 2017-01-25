@@ -171,9 +171,6 @@ typedef struct
 /* CODEC: VFW codec instance */
 typedef struct
 {
-    /* x264 handle */
-    x265_encoder *h;
-
     /* Configuration GUI params */
     CONFIG config;
 
@@ -205,10 +202,6 @@ typedef struct
     uint32_t i_fps_num;
     uint32_t i_fps_den;
 
-    /* Colorspace conversion */
-    x264vfw_csp_function_t csp;
-    x265_picture conv_pic;
-
     /* Log console */
     HWND hCons;
     int b_visible;
@@ -217,7 +210,6 @@ typedef struct
     int b_cli_output;
     char *cli_output_file;
     const char *cli_output_muxer;
-    cli_output_t cli_output;
     cli_output_opt_t cli_output_opt;
     hnd_t cli_hout;
 

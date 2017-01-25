@@ -25,7 +25,6 @@
 #define X264_OUTPUT_H
 
 #include <stdio.h>
-#include "x265.h"
 #include "x265cli.h"
 
 typedef struct
@@ -33,20 +32,5 @@ typedef struct
     void *p_private;
     int  use_dts_compress;
 } cli_output_opt_t;
-
-typedef struct
-{
-    int (*open_file)( char *psz_filename, hnd_t *p_handle, cli_output_opt_t *opt );
-    int (*set_param)( hnd_t handle, x265_param *p_param );
-    int (*write_headers)( hnd_t handle, x265_nal *p_nal );
-    int (*write_frame)( hnd_t handle, uint8_t *p_nal, int i_size, x265_picture *p_picture );
-    int (*close_file)( hnd_t handle, int64_t largest_pts, int64_t second_largest_pts );
-} cli_output_t;
-
-extern const cli_output_t raw_output;
-extern const cli_output_t mkv_output;
-extern const cli_output_t mp4_output;
-extern const cli_output_t flv_output;
-extern const cli_output_t avi_output;
 
 #endif

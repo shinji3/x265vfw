@@ -118,11 +118,9 @@ LRESULT WINAPI attribute_align_arg DriverProc(DWORD_PTR dwDriverId, HDRVR hDrive
             }
 
             memset(codec, 0, sizeof(CODEC));
-            x264vfw_config_reg_load(&codec->config);
 #if defined(HAVE_FFMPEG) && X264VFW_USE_DECODER
             codec->decoder_enabled = !codec->config.b_disable_decoder;
 #endif
-            x264vfw_default_compress_frames_info(codec);
 
             if (icopen)
                 icopen->dwError = ICERR_OK;
@@ -131,11 +129,9 @@ LRESULT WINAPI attribute_align_arg DriverProc(DWORD_PTR dwDriverId, HDRVR hDrive
 
         case DRV_CLOSE:
             /* From xvid: x264vfw_compress_end/x264vfw_decompress_end don't always get called */
-            x264vfw_compress_end(codec);
 #if defined(HAVE_FFMPEG) && X264VFW_USE_DECODER
             x264vfw_decompress_end(codec);
 #endif
-            x264vfw_log_destroy(codec);
             free(codec);
             return DRV_OK;
 
@@ -169,7 +165,6 @@ LRESULT WINAPI attribute_align_arg DriverProc(DWORD_PTR dwDriverId, HDRVR hDrive
         case ICM_SETSTATE:
             if (!(void *)lParam1)
             {
-                x264vfw_config_reg_load(&codec->config);
                 return 0;
             }
             if (lParam2 != sizeof(CONFIG) || ((CONFIG *)lParam1)->i_format_version != X264VFW_FORMAT_VERSION)
@@ -206,29 +201,6 @@ LRESULT WINAPI attribute_align_arg DriverProc(DWORD_PTR dwDriverId, HDRVR hDrive
             return sizeof(ICINFO);
         }
 
-        case ICM_CONFIGURE:
-            if (lParam1 != -1)
-            {
-                CONFIG_DATA temp;
-
-                memset(&temp, 0, sizeof(CONFIG_DATA));
-                memcpy(&temp.config, &codec->config, sizeof(CONFIG));
-
-                DialogBoxParamW(x264vfw_hInst, MAKEINTRESOURCEW(IDD_CONFIG), (HWND)lParam1, x264vfw_callback_main, (LPARAM)&temp);
-
-                if (temp.b_save)
-                {
-                    memcpy(&codec->config, &temp.config, sizeof(CONFIG));
-                    x264vfw_config_reg_save(&codec->config);
-                }
-            }
-            return ICERR_OK;
-
-        case ICM_ABOUT:
-            if (lParam1 != -1)
-                DialogBoxParamW(x264vfw_hInst, MAKEINTRESOURCEW(IDD_ABOUT), (HWND)lParam1, x264vfw_callback_about, 0);
-            return ICERR_OK;
-
         case ICM_GET:
             if (!(void *)lParam1)
                 return 0;
@@ -236,29 +208,6 @@ LRESULT WINAPI attribute_align_arg DriverProc(DWORD_PTR dwDriverId, HDRVR hDrive
 
         case ICM_SET:
             return 0;
-
-        /* Compressor */
-        case ICM_COMPRESS_GET_FORMAT:
-            return x264vfw_compress_get_format(codec, (BITMAPINFO *)lParam1, (BITMAPINFO *)lParam2);
-
-        case ICM_COMPRESS_GET_SIZE:
-            return x264vfw_compress_get_size(codec, (BITMAPINFO *)lParam1, (BITMAPINFO *)lParam2);
-
-        case ICM_COMPRESS_QUERY:
-            return x264vfw_compress_query(codec, (BITMAPINFO *)lParam1, (BITMAPINFO *)lParam2);
-
-        case ICM_COMPRESS_BEGIN:
-            return x264vfw_compress_begin(codec, (BITMAPINFO *)lParam1, (BITMAPINFO *)lParam2);
-
-        case ICM_COMPRESS:
-            return x264vfw_compress(codec, (ICCOMPRESS *)lParam1);
-
-        case ICM_COMPRESS_END:
-            x264vfw_default_compress_frames_info(codec);
-            return x264vfw_compress_end(codec);
-
-        case ICM_COMPRESS_FRAMES_INFO:
-            return x264vfw_compress_frames_info(codec, (ICCOMPRESSFRAMES *)lParam1);
 
 #if defined(HAVE_FFMPEG) && X264VFW_USE_DECODER
         /* Decompressor */

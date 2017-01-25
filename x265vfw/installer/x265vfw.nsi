@@ -112,7 +112,6 @@ Section "-Remove previous version"
 
   ${If} $PREV_INSTDIR != ""
     Delete "$SYSDIR_32bit\x265vfw.dll"
-    Delete "$SYSDIR_32bit\libx265.dll"
 
     SetShellVarContext all
     Delete "$SMPROGRAMS\${ShortName}\Configure ${ShortName}.lnk"
@@ -121,7 +120,6 @@ Section "-Remove previous version"
 
     Delete "$PREV_INSTDIR\x265vfw.dll"
     Delete "$PREV_INSTDIR\x265vfw.ico"
-    Delete "$PREV_INSTDIR\libx265.dll"
 
     !insertmacro UnRegCodec "vidc.x265"
 
@@ -161,7 +159,6 @@ Section "-Install"
 
   SetOutPath $SYSDIR_32bit
   File ".\x265vfw.dll"
-  File ".\libx265.dll"
 
   SetShellVarContext all
   ${If} ${FileExists} "$SYSDIR_32bit\rundll32.exe"
@@ -221,7 +218,6 @@ Section "Uninstall"
 keep_settings:
 
   Delete /REBOOTOK "$SYSDIR_32bit\x265vfw.dll"
-  Delete /REBOOTOK "$SYSDIR_32bit\libx265.dll"
 
   SetShellVarContext all
   Delete /REBOOTOK "$SMPROGRAMS\${ShortName}\Configure ${ShortName}.lnk"
@@ -229,7 +225,6 @@ keep_settings:
   Delete /REBOOTOK "$SMPROGRAMS\${ShortName}\Configure ${ShortName}.lnk"
 
   Delete /REBOOTOK "$INSTDIR\x265vfw.dll"
-  Delete /REBOOTOK "$INSTDIR\libx265.dll"
   Delete /REBOOTOK "$INSTDIR\x265vfw.ico"
 
   !insertmacro UnRegCodec "vidc.x265"

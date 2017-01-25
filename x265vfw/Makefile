@@ -19,11 +19,6 @@ DIR_CUR = $(shell pwd)
 # Path to include files (library and src)
 DIR_SRC = $(DIR_CUR)
 
-ifeq ($(X265_DIR)x,x)
-X265_DIR = $(DIR_CUR)/../x265-master
-X265_BIN_DIR = $(X265_DIR)/build/msys
-endif
-
 ifeq ($(FFMPEG_DIR)x,x)
 ifeq ($(FFMPEG_NAME)x,x)
 ifneq ($(wildcard $(DIR_CUR)/../ffmpeg/*)x,x)
@@ -82,13 +77,12 @@ endif
 
 # Constants which should not be modified
 CFLAGS += -D_WIN32_IE=0x0501
-CFLAGS += "-I$(X265_DIR)/source" "-I$(X265_BIN_DIR)"
 
 ##############################################################################
 # Compiler flags for linking stage
 ##############################################################################
 
-VFW_LDFLAGS = -static "-L$(X265_BIN_DIR)" -lx265.dll
+VFW_LDFLAGS = -static
 
 ##############################################################################
 # Conditional options
@@ -113,7 +107,7 @@ RESFLAGS += "-DDLL_NAME=$(DLL)"
 endif
 
 # Sources
-SRC_C = codec.c config.c csp.c driverproc.c
+SRC_C = codec.c driverproc.c
 SRC_RES = resource.rc
 
 # Muxers
@@ -203,10 +197,8 @@ distclean: clean
 $(INST_EXE): $(DLL)
 	@cp -f "$(DIR_SRC)/installer/$(INST_NSI)" "$(DIR_BUILD)/$(INST_NSI)"
 	@cp -f "$(DIR_SRC)/installer/x265vfw.ico" "$(DIR_BUILD)/x265vfw.ico"
-	@cp -f "$(X265_BIN_DIR)/libx265.dll" "$(DIR_BUILD)/libx265.dll"
 	@makensis "$(DIR_BUILD)/$(INST_NSI)"
 	@rm -f "$(DIR_BUILD)/$(INST_NSI)"
 	@rm -f "$(DIR_BUILD)/x265vfw.ico"
-	@rm -f "$(DIR_BUILD)/libx265.dll"
 
 build-installer: $(INST_EXE)
