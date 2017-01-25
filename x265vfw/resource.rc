@@ -190,7 +190,7 @@ BEGIN
             VALUE "FileDescription",  "x265vfw - H.265/MPEG-H codec"
             VALUE "FileVersion",      VER_FULL
             VALUE "InternalName",     "x265vfw"
-            VALUE "LegalCopyright",   "Copyright (C) 2003-2015 x265vfw project"
+            VALUE "LegalCopyright",   "Copyright (C) 2003-2016 x265vfw project"
             VALUE "OriginalFilename", xstr(DLL_NAME)
             VALUE "ProductName",      "x265vfw"
             VALUE "ProductVersion",   VER_FULL
