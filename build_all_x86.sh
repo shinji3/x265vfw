@@ -2,5 +2,4 @@
 # x265vfw configure needs an extra x64 config for proper working
 
 ./build_ffmpeg.sh
-./build_libx265.sh
 ./build_x265vfw.sh
