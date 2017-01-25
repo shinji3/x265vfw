@@ -27,7 +27,6 @@
 
 #include <assert.h>
 
-#define _GNU_SOURCE
 #include <getopt.h>
 
 const named_str_t x264vfw_preset_table[COUNT_PRESET] =
@@ -151,6 +150,7 @@ typedef enum
     RANGE_PC
 } range_enum;
 
+#ifdef _WIN32
 /* Functions for dealing with Unicode on Windows. */
 FILE *x264vfw_fopen(const char *filename, const char *mode)
 {
@@ -160,6 +160,36 @@ FILE *x264vfw_fopen(const char *filename, const char *mode)
         return _wfopen(filename_utf16, mode_utf16);
     return NULL;
 }
+
+int x264vfw_rename(const char *oldname, const char *newname)
+{
+    wchar_t oldname_utf16[MAX_PATH];
+    wchar_t newname_utf16[MAX_PATH];
+    if (utf8_to_utf16(oldname, oldname_utf16) && utf8_to_utf16(newname, newname_utf16))
+    {
+        /* POSIX says that rename() removes the destination, but Win32 doesn't. */
+        _wunlink(newname_utf16);
+        return _wrename(oldname_utf16, newname_utf16);
+    }
+    return -1;
+}
+
+int x264vfw_stat(const char *path, x264vfw_struct_stat *buf)
+{
+    wchar_t path_utf16[MAX_PATH];
+    if (utf8_to_utf16(path, path_utf16))
+        return _wstati64(path_utf16, buf);
+    return -1;
+}
+
+int x264vfw_is_pipe(const char *path)
+{
+    wchar_t path_utf16[MAX_PATH];
+    if (utf8_to_utf16(path, path_utf16))
+        return WaitNamedPipeW(path_utf16, 0);
+    return 0;
+}
+#endif
 
 /* Return a valid x264 colorspace or X264VFW_CSP_NONE if it is not supported */
 static int get_csp(BITMAPINFOHEADER *hdr)
