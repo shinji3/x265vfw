@@ -38,7 +38,6 @@
 
 #include "csp.h"
 #include "x265cli.h"
-#include "output/output.h"
 #include "resource.h"
 
 /* Name */
@@ -210,7 +209,6 @@ typedef struct
     int b_cli_output;
     char *cli_output_file;
     const char *cli_output_muxer;
-    cli_output_opt_t cli_output_opt;
     hnd_t cli_hout;
 
     /* Decoder */
