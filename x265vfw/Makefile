@@ -88,10 +88,7 @@ VFW_LDFLAGS = -static
 # Conditional options
 ##############################################################################
 
-RESFLAGS =
 ifeq ($(HAVE_FFMPEG),yes)
-RESFLAGS += -DHAVE_FFMPEG
-RESFLAGS += "-DFFMPEG_LOGO=$(FFMPEG_NAME).bmp"
 CFLAGS += -DHAVE_FFMPEG
 CFLAGS += "-I$(FFMPEG_DIR)"
 #VFW_LDFLAGS += "-L$(FFMPEG_DIR)/libavformat" -lavformat
@@ -101,14 +98,8 @@ VFW_LDFLAGS += "-L$(FFMPEG_DIR)/libswscale" -lswscale
 VFW_LDFLAGS += $(EXTRALIBS)
 endif
 
-ifneq ($(wildcard version.h)x,x)
-RESFLAGS += -DHAVE_VERSION
-RESFLAGS += "-DDLL_NAME=$(DLL)"
-endif
-
 # Sources
 SRC_C = codec.c driverproc.c
-SRC_RES = resource.rc
 
 # Muxers
 CONFIG =
@@ -126,7 +117,6 @@ endif
 ##############################################################################
 
 OBJECTS  = $(SRC_C:.c=.obj)
-OBJECTS += $(SRC_RES:.rc=.obj)
 
 .SUFFIXES:
 .SUFFIXES: .obj .rc .c
@@ -143,16 +133,10 @@ ifneq ($(wildcard .depend)x,x)
 include .depend
 endif
 
-# Resource dependence manually
-resource.obj: resource.rc resource.h x265vfw_config.h
-ifneq ($(wildcard version.h)x,x)
-resource.obj: version.h
-endif
-
 %.obj: %.rc
 	@echo " W: $(@D)/$(<F)"
 	@mkdir -p "$(DIR_BUILD)/$(@D)"
-	@$(RC) $(RESFLAGS) \
+	@$(RC) \
 	--input-format=rc \
 	--output-format=coff \
 	-o "$(DIR_BUILD)/$@" $<

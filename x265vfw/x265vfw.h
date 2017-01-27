@@ -38,7 +38,6 @@
 
 #include "csp.h"
 #include "x265cli.h"
-#include "resource.h"
 
 /* Name */
 #define X264VFW_NAME_L L"x265vfw"
