@@ -58,152 +58,32 @@
 #define FOURCC_UYVY mmioFOURCC('U','Y','V','Y')
 #define FOURCC_HDYC mmioFOURCC('H','D','Y','C')
 
-#define X264VFW_WEBSITE "http://sourceforge.net/projects/mpxplay/files/x265vfw"
-
 #define X264VFW_FORMAT_VERSION 4
 
-/* Limits */
-#define MAX_QUANT   51
-#define MAX_BITRATE 999999
-
-#define MAX_STATS_PATH   (MAX_PATH - 5) /* -5 because x264 add ".temp" for temp file */
-#define MAX_STATS_SIZE   X264_MAX(MAX_STATS_PATH, MAX_PATH)
-#define MAX_OUTPUT_PATH  MAX_PATH
-#define MAX_OUTPUT_SIZE  X264_MAX(MAX_OUTPUT_PATH, MAX_PATH)
-#define MAX_CMDLINE      4096
-
-#define COUNT_PRESET     10
-#define COUNT_TUNE       4
-#if !defined(X265_BIT_DEPTH) || (X265_BIT_DEPTH < 9)
-#define COUNT_PROFILE    7
-#elif (X265_BIT_DEPTH > 10)
-#define COUNT_PROFILE    19
-#else // X265_BIT_DEPTH == 10
-#define COUNT_PROFILE    13
-#endif
-#define COUNT_LEVEL      15
-#define COUNT_COLORSPACE 6
 #define COUNT_FOURCC     5
 
 /* Types */
 typedef struct
 {
     const char * const name;
-    const char * const value;
-} named_str_t;
-
-typedef struct
-{
-    const char * const name;
     const DWORD value;
 } named_fourcc_t;
-
-typedef struct
-{
-    const char * const name;
-    const int value;
-} named_int_t;
 
 /* CONFIG: VFW config */
 typedef struct
 {
     int i_format_version;
-    /* Basic */
-    int i_preset;
-    int i_tuning;
-    int i_profile;
-    int i_level;
-    int i_colorspace;
-    int b_fastdecode;
-    int b_zerolatency;
-    /* Rate control */
-    int i_encoding_type;
-    int i_qp;
-    int i_rf_constant;  /* 1pass VBR, nominal QP */
-    int i_passbitrate;
-    int i_pass;
-    int b_slow1pass;    /* Turns on some flags during 1st pass */
-    int b_createstats;  /* Creates the statsfile in single pass mode */
-    int b_updatestats;  /* Updates the statsfile during 2nd pass */
-    wchar_t stats[MAX_STATS_SIZE];
-    /* Output */
-    int i_output_mode;
-    int i_fourcc;
-#if X264VFW_USE_VIRTUALDUB_HACK
-    int b_vd_hack;
-#else
-    int reserved_b_vd_hack;
-#endif
-    wchar_t output_file[MAX_OUTPUT_SIZE];
-    /* Sample Aspect Ratio */
-    int i_sar_width;
-    int i_sar_height;
-    /* Debug */
-    int i_log_level;
-    int b_psnr;
-    int b_ssim;
-    int b_no_asm;
     /* Decoder && AVI Muxer */
 #if defined(HAVE_FFMPEG) && X264VFW_USE_DECODER
     int b_disable_decoder;
-#else
-    int reserved_b_disable_decoder;
 #endif
-    /* Extra command line */
-    wchar_t extra_cmdline[MAX_CMDLINE];
 } CONFIG;
-
-typedef struct
-{
-    CONFIG config;
-    HWND hMainDlg;
-    HWND hHelpDlg;
-    int b_dlg_updated;
-    int b_save;
-} CONFIG_DATA;
 
 /* CODEC: VFW codec instance */
 typedef struct
 {
     /* Configuration GUI params */
     CONFIG config;
-
-    /* Internal codec params */
-    int b_encoder_error;
-#if X264VFW_USE_BUGGY_APPS_HACK
-    BITMAPINFOHEADER *prev_lpbiOutput;
-    DWORD prev_output_biSizeImage;
-    int b_check_size;
-#endif
-#if X264VFW_USE_VIRTUALDUB_HACK
-    int b_use_vd_hack;
-    DWORD save_fourcc;
-#endif
-    int b_no_output;
-    int b_slow1pass;
-    int b_user_ref;
-    int i_frame_remain;
-    int b_warn_frame_loss;
-    int b_flush_delayed;
-
-    /* Preset/Tuning/Profile */
-    const char *preset;
-    const char *tune;
-    const char *profile;
-
-    /* ICM_COMPRESS_FRAMES_INFO params */
-    int i_frame_total;
-    uint32_t i_fps_num;
-    uint32_t i_fps_den;
-
-    /* Log console */
-    HWND hCons;
-    int b_visible;
-
-    /* CLI output */
-    int b_cli_output;
-    char *cli_output_file;
-    const char *cli_output_muxer;
 
     /* Decoder */
 #if defined(HAVE_FFMPEG) && X264VFW_USE_DECODER
@@ -221,19 +101,7 @@ typedef struct
     int                decoder_swap_UV;
     struct SwsContext  *sws;
 #endif
-
-    int is_frame_keyframe;
 } CODEC;
-
-/* Compress functions */
-LRESULT x264vfw_compress_get_format(CODEC *, BITMAPINFO *, BITMAPINFO *);
-LRESULT x264vfw_compress_get_size(CODEC *, BITMAPINFO *, BITMAPINFO *);
-LRESULT x264vfw_compress_query(CODEC *, BITMAPINFO *, BITMAPINFO *);
-LRESULT x264vfw_compress_begin(CODEC *, BITMAPINFO *, BITMAPINFO *);
-LRESULT x264vfw_compress(CODEC *, ICCOMPRESS *);
-LRESULT x264vfw_compress_end(CODEC *);
-LRESULT x264vfw_compress_frames_info(CODEC *, ICCOMPRESSFRAMES *);
-void x264vfw_default_compress_frames_info(CODEC *);
 
 #if defined(HAVE_FFMPEG) && X264VFW_USE_DECODER
 /* Decompress functions */
@@ -243,22 +111,6 @@ LRESULT x264vfw_decompress_begin(CODEC *, BITMAPINFO *, BITMAPINFO *);
 LRESULT x264vfw_decompress(CODEC *, ICDECOMPRESS *);
 LRESULT x264vfw_decompress_end(CODEC *);
 #endif
-
-/* Log functions */
-void x264vfw_log_create(CODEC *codec);
-void x264vfw_log_destroy(CODEC *codec);
-void x264vfw_log(CODEC *codec, int i_level, const char *psz_fmt, ...);
-
-/* Config functions */
-void x264vfw_config_defaults(CONFIG *config);
-void x264vfw_config_reg_load(CONFIG *config);
-void x264vfw_config_reg_save(CONFIG *config);
-
-/* Dialog callbacks */
-INT_PTR CALLBACK x264vfw_callback_main(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
-INT_PTR CALLBACK x264vfw_callback_about(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
-INT_PTR CALLBACK x264vfw_callback_log(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
-INT_PTR CALLBACK x264vfw_callback_help(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 /* DLL instance */
 extern HINSTANCE x264vfw_hInst;
