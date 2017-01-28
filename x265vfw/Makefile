@@ -91,7 +91,6 @@ VFW_LDFLAGS = -static
 ifeq ($(HAVE_FFMPEG),yes)
 CFLAGS += -DHAVE_FFMPEG
 CFLAGS += "-I$(FFMPEG_DIR)"
-#VFW_LDFLAGS += "-L$(FFMPEG_DIR)/libavformat" -lavformat
 VFW_LDFLAGS += "-L$(FFMPEG_DIR)/libavcodec" -lavcodec
 VFW_LDFLAGS += "-L$(FFMPEG_DIR)/libavutil" -lavutil
 VFW_LDFLAGS += "-L$(FFMPEG_DIR)/libswscale" -lswscale
