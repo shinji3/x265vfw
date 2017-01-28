@@ -72,7 +72,6 @@ typedef struct
 {
     /* Decoder */
 #if defined(HAVE_FFMPEG) && X264VFW_USE_DECODER
-    int                decoder_enabled;
     int                decoder_is_avc;
     AVCodec            *decoder;
     AVCodecContext     *decoder_context;

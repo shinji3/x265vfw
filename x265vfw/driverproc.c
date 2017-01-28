@@ -118,9 +118,6 @@ LRESULT WINAPI attribute_align_arg DriverProc(DWORD_PTR dwDriverId, HDRVR hDrive
             }
 
             memset(codec, 0, sizeof(CODEC));
-#if defined(HAVE_FFMPEG) && X264VFW_USE_DECODER
-            codec->decoder_enabled = 1;
-#endif
 
             if (icopen)
                 icopen->dwError = ICERR_OK;
@@ -172,8 +169,7 @@ LRESULT WINAPI attribute_align_arg DriverProc(DWORD_PTR dwDriverId, HDRVR hDrive
             icinfo->dwFlags      = VIDCF_COMPRESSFRAMES | VIDCF_FASTTEMPORALC;
 #if defined(HAVE_FFMPEG) && X264VFW_USE_DECODER
             /* ICM_GETINFO may be called before DRV_OPEN so 'codec' can point to NULL */
-            if (!codec || codec->decoder_enabled)
-                icinfo->dwFlags |= VIDCF_FASTTEMPORALD;
+            icinfo->dwFlags |= VIDCF_FASTTEMPORALD;
 #endif
             icinfo->dwVersion    = 0;
 #ifdef ICVERSION
@@ -198,62 +194,33 @@ LRESULT WINAPI attribute_align_arg DriverProc(DWORD_PTR dwDriverId, HDRVR hDrive
 #if defined(HAVE_FFMPEG) && X264VFW_USE_DECODER
         /* Decompressor */
         case ICM_DECOMPRESS_GET_FORMAT:
-            if (codec->decoder_enabled)
-                return x264vfw_decompress_get_format(codec, (BITMAPINFO *)lParam1, (BITMAPINFO *)lParam2);
-            else
-                return ICERR_UNSUPPORTED;
+            return x264vfw_decompress_get_format(codec, (BITMAPINFO *)lParam1, (BITMAPINFO *)lParam2);
 
         case ICM_DECOMPRESS_QUERY:
-            if (codec->decoder_enabled)
-                return x264vfw_decompress_query(codec, (BITMAPINFO *)lParam1, (BITMAPINFO *)lParam2);
-            else
-                return ICERR_UNSUPPORTED;
+            return x264vfw_decompress_query(codec, (BITMAPINFO *)lParam1, (BITMAPINFO *)lParam2);
 
         case ICM_DECOMPRESS_BEGIN:
-            if (codec->decoder_enabled)
-                return x264vfw_decompress_begin(codec, (BITMAPINFO *)lParam1, (BITMAPINFO *)lParam2);
-            else
-                return ICERR_UNSUPPORTED;
+            return x264vfw_decompress_begin(codec, (BITMAPINFO *)lParam1, (BITMAPINFO *)lParam2);
 
         case ICM_DECOMPRESS:
-            if (codec->decoder_enabled)
-                return x264vfw_decompress(codec, (ICDECOMPRESS *)lParam1);
-            else
-                return ICERR_UNSUPPORTED;
+            return x264vfw_decompress(codec, (ICDECOMPRESS *)lParam1);
 
         case ICM_DECOMPRESS_END:
-            if (codec->decoder_enabled)
-                return x264vfw_decompress_end(codec);
-            else
-                return ICERR_UNSUPPORTED;
+            return x264vfw_decompress_end(codec);
 
         case ICM_DECOMPRESSEX_QUERY:
-            if (codec->decoder_enabled) {
-                px = (ICDECOMPRESSEX *)lParam1;
-                return x264vfw_decompress_query(codec, (BITMAPINFO *)px->lpbiSrc, (BITMAPINFO *)px->lpbiDst);
-            } else {
-                return ICERR_UNSUPPORTED;
-            }
+            px = (ICDECOMPRESSEX *)lParam1;
+            return x264vfw_decompress_query(codec, (BITMAPINFO *)px->lpbiSrc, (BITMAPINFO *)px->lpbiDst);
 
         case ICM_DECOMPRESSEX_BEGIN:
-            if (codec->decoder_enabled) {
-                px = (ICDECOMPRESSEX *)lParam1;
-                return x264vfw_decompress_begin(codec, (BITMAPINFO *)px->lpbiSrc, (BITMAPINFO *)px->lpbiDst);
-            } else {
-                return ICERR_UNSUPPORTED;
-            }
+            px = (ICDECOMPRESSEX *)lParam1;
+            return x264vfw_decompress_begin(codec, (BITMAPINFO *)px->lpbiSrc, (BITMAPINFO *)px->lpbiDst);
 
         case ICM_DECOMPRESSEX:
-            if (codec->decoder_enabled)
-                return x264vfw_decompress(codec, (ICDECOMPRESS *)lParam1);
-            else
-                return ICERR_UNSUPPORTED;
+            return x264vfw_decompress(codec, (ICDECOMPRESS *)lParam1);
 
         case ICM_DECOMPRESSEX_END:
-            if (codec->decoder_enabled)
-                return x264vfw_decompress_end(codec);
-            else
-                return ICERR_UNSUPPORTED;
+            return x264vfw_decompress_end(codec);
 #endif
 
         default:
