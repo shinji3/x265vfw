@@ -119,7 +119,7 @@ LRESULT WINAPI attribute_align_arg DriverProc(DWORD_PTR dwDriverId, HDRVR hDrive
 
             memset(codec, 0, sizeof(CODEC));
 #if defined(HAVE_FFMPEG) && X264VFW_USE_DECODER
-            codec->decoder_enabled = !codec->config.b_disable_decoder;
+            codec->decoder_enabled = 1;
 #endif
 
             if (icopen)
@@ -153,24 +153,10 @@ LRESULT WINAPI attribute_align_arg DriverProc(DWORD_PTR dwDriverId, HDRVR hDrive
 
         /* ICM */
         case ICM_GETSTATE:
-            if (!(void *)lParam1)
-                return sizeof(CONFIG);
-            if (lParam2 != sizeof(CONFIG))
-                return ICERR_BADSIZE;
-            memcpy((void *)lParam1, &codec->config, sizeof(CONFIG));
-            /* Set format version */
-            ((CONFIG *)lParam1)->i_format_version = X264VFW_FORMAT_VERSION;
             return ICERR_OK;
 
         case ICM_SETSTATE:
-            if (!(void *)lParam1)
-            {
-                return 0;
-            }
-            if (lParam2 != sizeof(CONFIG) || ((CONFIG *)lParam1)->i_format_version != X264VFW_FORMAT_VERSION)
-                return 0;
-            memcpy(&codec->config, (void *)lParam1, sizeof(CONFIG));
-            return sizeof(CONFIG);
+            return 0;
 
         case ICM_GETINFO:
         {

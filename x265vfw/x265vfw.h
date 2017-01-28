@@ -58,8 +58,6 @@
 #define FOURCC_UYVY mmioFOURCC('U','Y','V','Y')
 #define FOURCC_HDYC mmioFOURCC('H','D','Y','C')
 
-#define X264VFW_FORMAT_VERSION 4
-
 #define COUNT_FOURCC     5
 
 /* Types */
@@ -69,22 +67,9 @@ typedef struct
     const DWORD value;
 } named_fourcc_t;
 
-/* CONFIG: VFW config */
-typedef struct
-{
-    int i_format_version;
-    /* Decoder && AVI Muxer */
-#if defined(HAVE_FFMPEG) && X264VFW_USE_DECODER
-    int b_disable_decoder;
-#endif
-} CONFIG;
-
 /* CODEC: VFW codec instance */
 typedef struct
 {
-    /* Configuration GUI params */
-    CONFIG config;
-
     /* Decoder */
 #if defined(HAVE_FFMPEG) && X264VFW_USE_DECODER
     int                decoder_enabled;
