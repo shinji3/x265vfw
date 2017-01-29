@@ -77,13 +77,11 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
     return TRUE;
 }
 
-#if defined(HAVE_FFMPEG)
 static void log_callback(void *ptr, int level, const char *fmt, va_list vl)
 {
     if (level <= av_log_get_level())
         DVPRINTF(fmt, vl);
 }
-#endif
 
 /* This little puppy handles the calls which VFW programs send out to the codec */
 LRESULT WINAPI attribute_align_arg DriverProc(DWORD_PTR dwDriverId, HDRVR hDriver, UINT uMsg, LPARAM lParam1, LPARAM lParam2)
@@ -94,10 +92,8 @@ LRESULT WINAPI attribute_align_arg DriverProc(DWORD_PTR dwDriverId, HDRVR hDrive
     switch (uMsg)
     {
         case DRV_LOAD:
-#if defined(HAVE_FFMPEG)
             avcodec_register_all();
             av_log_set_callback(log_callback);
-#endif
             return DRV_OK;
 
         case DRV_FREE:
@@ -126,9 +122,7 @@ LRESULT WINAPI attribute_align_arg DriverProc(DWORD_PTR dwDriverId, HDRVR hDrive
 
         case DRV_CLOSE:
             /* From xvid: x264vfw_compress_end/x264vfw_decompress_end don't always get called */
-#if defined(HAVE_FFMPEG) && X264VFW_USE_DECODER
             x264vfw_decompress_end(codec);
-#endif
             free(codec);
             return DRV_OK;
 
@@ -167,10 +161,8 @@ LRESULT WINAPI attribute_align_arg DriverProc(DWORD_PTR dwDriverId, HDRVR hDrive
             icinfo->fccType      = ICTYPE_VIDEO;
             icinfo->fccHandler   = FOURCC_X264;
             icinfo->dwFlags      = VIDCF_COMPRESSFRAMES | VIDCF_FASTTEMPORALC;
-#if defined(HAVE_FFMPEG) && X264VFW_USE_DECODER
             /* ICM_GETINFO may be called before DRV_OPEN so 'codec' can point to NULL */
             icinfo->dwFlags |= VIDCF_FASTTEMPORALD;
-#endif
             icinfo->dwVersion    = 0;
 #ifdef ICVERSION
             icinfo->dwVersionICM = ICVERSION;
@@ -191,7 +183,6 @@ LRESULT WINAPI attribute_align_arg DriverProc(DWORD_PTR dwDriverId, HDRVR hDrive
         case ICM_SET:
             return 0;
 
-#if defined(HAVE_FFMPEG) && X264VFW_USE_DECODER
         /* Decompressor */
         case ICM_DECOMPRESS_GET_FORMAT:
             return x264vfw_decompress_get_format(codec, (BITMAPINFO *)lParam1, (BITMAPINFO *)lParam2);
@@ -221,7 +212,6 @@ LRESULT WINAPI attribute_align_arg DriverProc(DWORD_PTR dwDriverId, HDRVR hDrive
 
         case ICM_DECOMPRESSEX_END:
             return x264vfw_decompress_end(codec);
-#endif
 
         default:
             if (uMsg < DRV_USER)

@@ -28,10 +28,8 @@
 #include "common.h"
 #include <vfw.h>
 
-#if defined(HAVE_FFMPEG)
 #include <libavcodec/avcodec.h>
 #include <libswscale/swscale.h>
-#endif
 
 #include "csp.h"
 
@@ -71,7 +69,6 @@ typedef struct
 typedef struct
 {
     /* Decoder */
-#if defined(HAVE_FFMPEG) && X264VFW_USE_DECODER
     int                decoder_is_avc;
     AVCodec            *decoder;
     AVCodecContext     *decoder_context;
@@ -84,17 +81,14 @@ typedef struct
     int                decoder_vflip;
     int                decoder_swap_UV;
     struct SwsContext  *sws;
-#endif
 } CODEC;
 
-#if defined(HAVE_FFMPEG) && X264VFW_USE_DECODER
 /* Decompress functions */
 LRESULT x264vfw_decompress_get_format(CODEC *, BITMAPINFO *, BITMAPINFO *);
 LRESULT x264vfw_decompress_query(CODEC *, BITMAPINFO *, BITMAPINFO *);
 LRESULT x264vfw_decompress_begin(CODEC *, BITMAPINFO *, BITMAPINFO *);
 LRESULT x264vfw_decompress(CODEC *, ICDECOMPRESS *);
 LRESULT x264vfw_decompress_end(CODEC *);
-#endif
 
 /* DLL instance */
 extern HINSTANCE x264vfw_hInst;
