@@ -4,4 +4,3 @@ DESCRIPTION 'x265vfw - H.265/MPEG-H codec'
 
 EXPORTS
 	DriverProc
-	Configure

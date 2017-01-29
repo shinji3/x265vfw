@@ -230,19 +230,3 @@ LRESULT WINAPI attribute_align_arg DriverProc(DWORD_PTR dwDriverId, HDRVR hDrive
                 return ICERR_UNSUPPORTED;
     }
 }
-
-void WINAPI Configure(HWND hwnd, HINSTANCE hinst, LPTSTR lpCmdLine, int nCmdShow)
-{
-    if (DriverProc(0, 0, DRV_LOAD, 0, 0))
-    {
-        DWORD_PTR dwDriverId;
-
-        dwDriverId = DriverProc(0, 0, DRV_OPEN, 0, 0);
-        if (dwDriverId != (DWORD_PTR)NULL)
-        {
-            DriverProc(dwDriverId, 0, ICM_CONFIGURE, (LPARAM)GetDesktopWindow(), 0);
-            DriverProc(dwDriverId, 0, DRV_CLOSE, 0, 0);
-        }
-        DriverProc(0, 0, DRV_FREE, 0, 0);
-    }
-}
