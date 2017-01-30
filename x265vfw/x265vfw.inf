@@ -1,0 +1,81 @@
+[Version]
+Signature = "$CHICAGO$"
+Class = MEDIA
+
+[SourceDisksNames]
+1="OEM Multimedia Disk",, 0001
+
+[SourceDisksFiles]
+x265vfw.dll=1
+x265vfw.inf=1
+
+[Installable.Drivers]
+X265 = 1:x265vfw.dll, "vidc.X265", %DisplayName% , , ,
+
+[DefaultInstall]
+CopyFiles = X265.Copy.Inf,X265.Copy
+Updateinis = X265.Updateini
+addreg = X265.AddReg9x
+MediaType = SOFTWARE
+
+[DefaultInstall.ntx86]
+CopyFiles = X265.Copy.Inf,X265.Copy
+addreg = X265.AddRegNT
+MediaType = SOFTWARE
+
+[DefaultUninstall]
+DelReg = X265.DelReg
+DelFiles = X265.Copy,X265.Copy.Inf
+UpdateInis = X265.DelIni
+
+[X265.Copy]
+x265vfw.dll
+
+[X265.Copy.Inf]
+x265vfw.inf
+
+[X265.UpdateIni]
+system.ini, drivers32,,"vidc.X265=x265vfw.dll"
+
+[X265.DelIni]
+system.ini, drivers32,"vidc.X265=x265vfw.dll",
+
+[X265.AddReg9x]
+HKLM,SYSTEM\CurrentControlSet\Control\MediaResources\icm\vidc.X265,Description,,%DisplayName%
+HKLM,SYSTEM\CurrentControlSet\Control\MediaResources\icm\vidc.X265,Driver,,x265vfw.dll
+HKLM,SYSTEM\CurrentControlSet\Control\MediaResources\icm\vidc.X265,FriendlyName,,"X265"
+
+HKLM,%UnInstallPath%,DisplayName,,%DisplayName%
+HKLM,%UnInstallPath%,UninstallString,,"%10%\rundll.exe setupx.dll,InstallHinfSection DefaultUninstall 132 %17%\%InfFile%"
+
+[X265.AddRegNT]
+HKLM,SOFTWARE\Microsoft\Windows NT\CurrentVersion\drivers.desc,x265vfw.dll,,%DisplayName%
+HKLM,SOFTWARE\Microsoft\Windows NT\CurrentVersion\drivers32,vidc.X265,,x265vfw.dll
+
+HKLM,%UnInstallPath%,DisplayName,,%DisplayName%
+HKLM,%UnInstallPath%,DisplayIcon,,"%11%\x265vfw.dll,0"
+HKLM,%UnInstallPath%,Publisher,,%mfgname%
+HKLM,%UnInstallPath%,HelpLink,,%Website%
+HKLM,%UnInstallPath%,NoModify,%REG_DWORD%,1
+HKLM,%UnInstallPath%,NoRepair,%REG_DWORD%,1
+HKLM,%UnInstallPath%,UninstallString,,"%11%\rundll32.exe setupapi,InstallHinfSection DefaultUninstall 132 %17%\%InfFile%"
+
+[X265.DelReg]
+HKLM,SYSTEM\CurrentControlSet\Control\MediaResources\icm\vidc.X265
+
+HKLM,SOFTWARE\Microsoft\Windows NT\CurrentVersion\drivers.desc,x265vfw.dll,,""
+HKLM,%UnInstallPath%
+
+[DestinationDirs]
+DefaultDestDir = 11	; LDID_SYS
+X265.Copy = 11
+X265.Copy.Inf = 17
+
+[Strings]
+DisplayName="x265vfw - H.265/MPEG-H codec"
+InfFile="x265vfw.inf"
+UnInstallPath="Software\Microsoft\Windows\CurrentVersion\Uninstall\x265vfw"
+MediaClassName="Media Devices"
+mfgname="shinji3"
+Website="https://github.com/shinji3/x265vfw"
+REG_DWORD=0x00010001
