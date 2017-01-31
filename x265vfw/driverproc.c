@@ -160,9 +160,7 @@ LRESULT WINAPI attribute_align_arg DriverProc(DWORD_PTR dwDriverId, HDRVR hDrive
             icinfo->dwSize       = sizeof(ICINFO);
             icinfo->fccType      = ICTYPE_VIDEO;
             icinfo->fccHandler   = FOURCC_X264;
-            icinfo->dwFlags      = VIDCF_COMPRESSFRAMES | VIDCF_FASTTEMPORALC;
-            /* ICM_GETINFO may be called before DRV_OPEN so 'codec' can point to NULL */
-            icinfo->dwFlags |= VIDCF_FASTTEMPORALD;
+            icinfo->dwFlags      = VIDCF_FASTTEMPORALD;
             icinfo->dwVersion    = 0;
 #ifdef ICVERSION
             icinfo->dwVersionICM = ICVERSION;
