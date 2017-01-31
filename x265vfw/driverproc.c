@@ -28,16 +28,11 @@
 #include <pthread.h>
 #endif
 
-/* Global DLL instance */
-HINSTANCE x264vfw_hInst;
 /* Global DLL critical section */
 CRITICAL_SECTION x264vfw_CS;
 
-/* Calling back point for our DLL so we can keep track of the window in x264vfw_hInst */
 BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 {
-    x264vfw_hInst = hinstDLL;
-
 #ifdef PTW32_STATIC_LIB
     switch (fdwReason)
     {

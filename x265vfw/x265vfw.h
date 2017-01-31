@@ -90,8 +90,6 @@ LRESULT x264vfw_decompress_begin(CODEC *, BITMAPINFO *, BITMAPINFO *);
 LRESULT x264vfw_decompress(CODEC *, ICDECOMPRESS *);
 LRESULT x264vfw_decompress_end(CODEC *);
 
-/* DLL instance */
-extern HINSTANCE x264vfw_hInst;
 /* DLL critical section */
 extern CRITICAL_SECTION x264vfw_CS;
 
