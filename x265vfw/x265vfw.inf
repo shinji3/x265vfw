@@ -23,6 +23,8 @@ CopyFiles = X265.Copy.Inf,X265.Copy
 addreg = X265.AddRegNT
 MediaType = SOFTWARE
 
+[DefaultInstall.ntamd64]
+
 [DefaultUninstall]
 DelReg = X265.DelReg
 DelFiles = X265.Copy,X265.Copy.Inf

@@ -123,6 +123,7 @@ endif
 $(DLL): .depend config.mak config.h $(OBJECTS)
 	@echo " L: $(@F)"
 	@mkdir -p "$(DIR_BUILD)"
+	@cp -f "$(DIR_SRC)/x265vfw.bat" "$(DIR_BUILD)/x265vfw.bat"
 	@cp -f "$(DIR_SRC)/x265vfw.inf" "$(DIR_BUILD)/x265vfw.inf"
 	@cp -f "$(DIR_SRC)/driverproc.def" "$(DIR_BUILD)/driverproc.def"
 	@cd "$(DIR_BUILD)" && \
