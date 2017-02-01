@@ -13,14 +13,10 @@ IF "%PROCESSOR_ARCHITECTURE%"=="" GOTO INSTALL_X86
 IF %PROCESSOR_ARCHITECTURE%==x86 GOTO INSTALL_X86
 
 "%SystemRoot%\SysWOW64\rundll32.exe" setupapi.dll,InstallHinfSection DefaultInstall 132 .\%FILENAME%
-GOTO INSTALL_DONE
+GOTO End
 
 :INSTALL_X86
 rundll32.exe setupapi.dll,InstallHinfSection DefaultInstall 132 .\%FILENAME%
-
-:INSTALL_DONE
-CLS
-TYPE ..\COPYING.txt | more
 GOTO End
 
 :FILE_MISSING
