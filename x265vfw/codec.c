@@ -35,7 +35,9 @@ const named_fourcc_t x264vfw_fourcc_table[COUNT_FOURCC] =
     { "H265", mmioFOURCC('H','2','6','5') },
     { "h265", mmioFOURCC('h','2','6','5') },
     { "X265", mmioFOURCC('X','2','6','5') },
-    { "x265", mmioFOURCC('x','2','6','5') }
+    { "x265", mmioFOURCC('x','2','6','5') },
+    { "hvc1", mmioFOURCC('h','v','c','1') },
+    { "hev1", mmioFOURCC('h','e','v','1') }
 };
 
 /* Return a valid x264 colorspace or X264VFW_CSP_NONE if it is not supported */

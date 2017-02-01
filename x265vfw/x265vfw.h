@@ -56,7 +56,7 @@
 #define FOURCC_UYVY mmioFOURCC('U','Y','V','Y')
 #define FOURCC_HDYC mmioFOURCC('H','D','Y','C')
 
-#define COUNT_FOURCC     5
+#define COUNT_FOURCC     7
 
 /* Types */
 typedef struct
