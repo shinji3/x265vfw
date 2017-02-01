@@ -41,14 +41,6 @@ ifeq ($(FFMPEG_NAME)x,x)
 FFMPEG_NAME = ffmpeg
 endif
 
-ifeq ($(HAVE_FFMPEG)x,x)
-ifeq ($(FFMPEG_DIR)x,x)
-HAVE_FFMPEG = no
-else
-HAVE_FFMPEG = yes
-endif
-endif
-
 -include config.mak
 
 ifeq ($(SYS_ARCH),X86_64)
@@ -88,14 +80,11 @@ VFW_LDFLAGS = -static
 # Conditional options
 ##############################################################################
 
-ifeq ($(HAVE_FFMPEG),yes)
-CFLAGS += -DHAVE_FFMPEG
 CFLAGS += "-I$(FFMPEG_DIR)"
 VFW_LDFLAGS += "-L$(FFMPEG_DIR)/libavcodec" -lavcodec
 VFW_LDFLAGS += "-L$(FFMPEG_DIR)/libavutil" -lavutil
 VFW_LDFLAGS += "-L$(FFMPEG_DIR)/libswscale" -lswscale
 VFW_LDFLAGS += $(EXTRALIBS)
-endif
 
 # Sources
 SRC_C = codec.c driverproc.c
