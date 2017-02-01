@@ -46,21 +46,9 @@ endif
 ifeq ($(SYS_ARCH),X86_64)
 # Dll to build
 DLL = x265vfw64.dll
-
-# Installer script
-INST_NSI = x265vfw64.nsi
-
-# Installer executable
-INST_EXE = x265vfw64.exe
 else
 # Dll to build
 DLL = x265vfw.dll
-
-# Installer script
-INST_NSI = x265vfw.nsi
-
-# Installer executable
-INST_EXE = x265vfw.exe
 endif
 
 ##############################################################################
@@ -107,7 +95,7 @@ OBJECTS  = $(SRC_C:.c=.obj)
 DIR_BUILD = $(DIR_CUR)/bin
 VPATH = $(DIR_SRC):$(DIR_BUILD)
 
-.PHONY: all clean distclean build-installer
+.PHONY: all clean distclean
 
 all: $(DLL)
 
@@ -135,6 +123,7 @@ endif
 $(DLL): .depend config.mak config.h $(OBJECTS)
 	@echo " L: $(@F)"
 	@mkdir -p "$(DIR_BUILD)"
+	@cp -f "$(DIR_SRC)/x265vfw.inf" "$(DIR_BUILD)/x265vfw.inf"
 	@cp -f "$(DIR_SRC)/driverproc.def" "$(DIR_BUILD)/driverproc.def"
 	@cd "$(DIR_BUILD)" && \
 	$(CC) \
@@ -154,17 +143,3 @@ distclean: clean
 	@rm -f "$(DIR_CUR)/config.mak"
 	@echo " Cl: config.h"
 	@rm -f "$(DIR_CUR)/config.h"
-
-##############################################################################
-# Builds the NSIS installer script for Windows.
-# NSIS 2.x is required and makensis.exe should be in the path
-##############################################################################
-
-$(INST_EXE): $(DLL)
-	@cp -f "$(DIR_SRC)/installer/$(INST_NSI)" "$(DIR_BUILD)/$(INST_NSI)"
-	@cp -f "$(DIR_SRC)/installer/x265vfw.ico" "$(DIR_BUILD)/x265vfw.ico"
-	@makensis "$(DIR_BUILD)/$(INST_NSI)"
-	@rm -f "$(DIR_BUILD)/$(INST_NSI)"
-	@rm -f "$(DIR_BUILD)/x265vfw.ico"
-
-build-installer: $(INST_EXE)
