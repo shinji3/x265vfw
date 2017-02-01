@@ -95,11 +95,6 @@ ifneq ($(wildcard config.h)x,x)
 CONFIG := $(shell cat config.h)
 endif
 
-# MinGW64 bugfix
-ifeq ($(SYS_ARCH),X86_64)
-VFW_LDFLAGS += -liconv
-endif
-
 ##############################################################################
 # Rules
 ##############################################################################
@@ -114,8 +109,7 @@ VPATH = $(DIR_SRC):$(DIR_BUILD)
 
 .PHONY: all clean distclean build-installer
 
-# all: $(DLL)
-all: build-installer
+all: $(DLL)
 
 ifneq ($(wildcard .depend)x,x)
 include .depend
