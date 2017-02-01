@@ -23,9 +23,6 @@
 #ifndef X264VFW_COMMON_H
 #define X264VFW_COMMON_H
 
-#define _LARGEFILE_SOURCE 1
-#define _FILE_OFFSET_BITS 64
-
 #include "x265vfw_config.h"
 
 #include <stdlib.h>
@@ -46,32 +43,18 @@
 
 #ifdef _MSC_VER
 #define inline __inline
-#define strcasecmp _stricmp
-#define strncasecmp _strnicmp
-#define strtok_r strtok_s
-#define S_ISREG(x) (((x) & S_IFMT) == S_IFREG)
-#if _MSC_VER < 1900
-#define snprintf _snprintf
-#endif
 #else
 #include <strings.h>
 #endif
 
 #if defined(__GNUC__) && (__GNUC__ > 3 || __GNUC__ == 3 && __GNUC_MINOR__ > 0)
-#define UNUSED __attribute__((unused))
 #define ALWAYS_INLINE __attribute__((always_inline)) inline
-#define NOINLINE __attribute__((noinline))
-#define MAY_ALIAS __attribute__((may_alias))
 #else
 #ifdef _MSC_VER
 #define ALWAYS_INLINE __forceinline
-#define NOINLINE __declspec(noinline)
 #else
 #define ALWAYS_INLINE inline
-#define NOINLINE
 #endif
-#define UNUSED
-#define MAY_ALIAS
 #endif
 
 #if defined(__GNUC__) && (__GNUC__ > 4 || __GNUC__ == 4 && __GNUC_MINOR__>1)
@@ -80,22 +63,11 @@
 #define attribute_align_arg
 #endif
 
-#define X264_MIN(a, b) (((a)<(b)) ? (a) : (b))
-#define X264_MAX(a, b) (((a)>(b)) ? (a) : (b))
-#define X264_CLIP(v, min, max) (((v)<(min)) ? (min) : ((v)>(max)) ? (max) : (v))
-#define ARRAY_ELEMS(a) ((sizeof(a))/(sizeof(a[0])))
-
-#define WORD_SIZE sizeof(void*)
-
 #define asm __asm__
 
 #if WORDS_BIGENDIAN
-#define endian_fix(x) (x)
-#define endian_fix64(x) (x)
 #define endian_fix32(x) (x)
-#define endian_fix16(x) (x)
-#else
-#if HAVE_X86_INLINE_ASM && HAVE_MMX
+#elif HAVE_X86_INLINE_ASM && HAVE_MMX
 static ALWAYS_INLINE uint32_t endian_fix32( uint32_t x )
 {
     asm("bswap %0":"+r"(x));
@@ -111,27 +83,6 @@ static ALWAYS_INLINE uint32_t endian_fix32( uint32_t x )
 static ALWAYS_INLINE uint32_t endian_fix32( uint32_t x )
 {
     return (x<<24) + ((x<<8)&0xff0000) + ((x>>8)&0xff00) + (x>>24);
-}
-#endif
-#if HAVE_X86_INLINE_ASM && ARCH_X86_64
-static ALWAYS_INLINE uint64_t endian_fix64( uint64_t x )
-{
-    asm("bswap %0":"+r"(x));
-    return x;
-}
-#else
-static ALWAYS_INLINE uint64_t endian_fix64( uint64_t x )
-{
-    return endian_fix32(x>>32) + ((uint64_t)endian_fix32(x)<<32);
-}
-#endif
-static ALWAYS_INLINE intptr_t endian_fix( intptr_t x )
-{
-    return WORD_SIZE == 8 ? endian_fix64(x) : endian_fix32(x);
-}
-static ALWAYS_INLINE uint16_t endian_fix16( uint16_t x )
-{
-    return (x<<8)|(x>>8);
 }
 #endif
 
