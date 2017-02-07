@@ -43,6 +43,8 @@ system.ini, drivers32,,"vidc.X265=x265vfw.dll"
 system.ini, drivers32,"vidc.X265=x265vfw.dll",
 
 [X265.AddReg9x]
+HKCU,SOFTWARE\Microsoft\MediaPlayer\Preferences\VideoSettings,IgnoreAVSync,%REG_DWORD%,1
+
 HKLM,SYSTEM\CurrentControlSet\Control\MediaResources\icm\vidc.X265,Description,,%DisplayName%
 HKLM,SYSTEM\CurrentControlSet\Control\MediaResources\icm\vidc.X265,Driver,,x265vfw.dll
 HKLM,SYSTEM\CurrentControlSet\Control\MediaResources\icm\vidc.X265,FriendlyName,,"X265"
@@ -51,6 +53,8 @@ HKLM,%UnInstallPath%,DisplayName,,%DisplayName%
 HKLM,%UnInstallPath%,UninstallString,,"%10%\rundll.exe setupx.dll,InstallHinfSection DefaultUninstall 132 %17%\%InfFile%"
 
 [X265.AddRegNT]
+HKCU,SOFTWARE\Microsoft\MediaPlayer\Preferences\VideoSettings,IgnoreAVSync,%REG_DWORD%,1
+
 HKLM,SOFTWARE\Microsoft\Windows NT\CurrentVersion\drivers.desc,x265vfw.dll,,%DisplayName%
 HKLM,SOFTWARE\Microsoft\Windows NT\CurrentVersion\drivers32,vidc.X265,,x265vfw.dll
 
