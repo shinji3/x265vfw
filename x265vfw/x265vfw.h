@@ -88,6 +88,7 @@ LRESULT x264vfw_decompress_get_format(CODEC *, BITMAPINFO *, BITMAPINFO *);
 LRESULT x264vfw_decompress_query(CODEC *, BITMAPINFO *, BITMAPINFO *);
 LRESULT x264vfw_decompress_begin(CODEC *, BITMAPINFO *, BITMAPINFO *);
 LRESULT x264vfw_decompress(CODEC *, ICDECOMPRESS *);
+LRESULT x264vfw_decompress_ex(CODEC *, ICDECOMPRESSEX *);
 LRESULT x264vfw_decompress_end(CODEC *);
 
 /* DLL critical section */

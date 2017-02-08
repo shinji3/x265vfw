@@ -669,6 +669,140 @@ LRESULT x264vfw_decompress(CODEC *codec, ICDECOMPRESS *icd)
     return ICERR_OK;
 }
 
+LRESULT x264vfw_decompress_ex(CODEC *codec, ICDECOMPRESSEX *icd)
+{
+    BITMAPINFOHEADER *inhdr = icd->lpbiSrc;
+    DWORD neededsize = inhdr->biSizeImage + FF_INPUT_BUFFER_PADDING_SIZE;
+    int len, got_picture;
+    AVPicture picture;
+    int picture_size;
+
+    got_picture = 0;
+#if X264VFW_USE_VIRTUALDUB_HACK
+    if (!(inhdr->biSizeImage == 1 && ((uint8_t *)icd->lpSrc)[0] == 0x7f))
+    {
+#endif
+        /* Check overflow */
+        if (neededsize < FF_INPUT_BUFFER_PADDING_SIZE)
+        {
+            DPRINTF("buffer overflow check failed\n");
+            return ICERR_ERROR;
+        }
+        if (codec->decoder_buf_size < neededsize)
+        {
+            av_free(codec->decoder_buf);
+            codec->decoder_buf_size = 0;
+            codec->decoder_buf = av_malloc(neededsize);
+            if (!codec->decoder_buf)
+            {
+                DPRINTF("failed to realloc decoder buffer\n");
+                return ICERR_ERROR;
+            }
+            codec->decoder_buf_size = neededsize;
+        }
+        memcpy(codec->decoder_buf, icd->lpSrc, inhdr->biSizeImage);
+        memset(codec->decoder_buf + inhdr->biSizeImage, 0, FF_INPUT_BUFFER_PADDING_SIZE);
+        codec->decoder_pkt.data = codec->decoder_buf;
+        codec->decoder_pkt.size = inhdr->biSizeImage;
+
+        if (inhdr->biSizeImage >= 4 && !codec->decoder_is_avc)
+        {
+            uint8_t *buf = codec->decoder_buf;
+            uint32_t buf_size = inhdr->biSizeImage;
+            uint32_t nal_size = endian_fix32(*(uint32_t *)buf);
+            /* Check startcode */
+            if (nal_size != 0x00000001)
+            {
+                /* Check that this is correct size prefixed format */
+                while ((uint64_t)buf_size >= (uint64_t)nal_size + 8)
+                {
+                    buf += nal_size + 4;
+                    buf_size -= nal_size + 4;
+                    nal_size = endian_fix32(*(uint32_t *)buf);
+                }
+                if ((uint64_t)buf_size == (uint64_t)nal_size + 4)
+                {
+                    /* Convert to Annex B */
+                    buf = codec->decoder_buf;
+                    buf_size = inhdr->biSizeImage;
+                    nal_size = endian_fix32(*(uint32_t *)buf);
+                    *(uint32_t *)buf = endian_fix32(0x00000001);
+                    while ((uint64_t)buf_size >= (uint64_t)nal_size + 8)
+                    {
+                        buf += nal_size + 4;
+                        buf_size -= nal_size + 4;
+                        nal_size = endian_fix32(*(uint32_t *)buf);
+                        *(uint32_t *)buf = endian_fix32(0x00000001);
+                    }
+                }
+            }
+        }
+
+        len = avcodec_decode_video2(codec->decoder_context, codec->decoder_frame, &got_picture, &codec->decoder_pkt);
+        if (len < 0)
+        {
+            DPRINTF("avcodec_decode_video2 failed\n");
+            return ICERR_ERROR;
+        }
+#if X264VFW_USE_VIRTUALDUB_HACK
+    }
+#endif
+
+    picture_size = x264vfw_picture_get_size(codec->decoder_pix_fmt, inhdr->biWidth, inhdr->biHeight);
+    if (picture_size < 0)
+    {
+        DPRINTF("x264vfw_picture_get_size failed\n");
+        return ICERR_ERROR;
+    }
+
+    if (!got_picture)
+    {
+        /* Frame was decoded but delayed so we would show the BLACK-frame instead */
+        x264vfw_fill_black_frame(icd->lpDst, codec->decoder_pix_fmt, picture_size);
+        //icd->lpbiDst->biSizeImage = picture_size;
+        return ICERR_OK;
+    }
+
+    if (x264vfw_picture_fill(&picture, icd->lpDst, codec->decoder_pix_fmt, inhdr->biWidth, inhdr->biHeight) < 0)
+    {
+        DPRINTF("x264vfw_picture_fill failed\n");
+        return ICERR_ERROR;
+    }
+    if (codec->decoder_swap_UV)
+    {
+        uint8_t *temp_data;
+        int     temp_linesize;
+
+        temp_data = picture.data[1];
+        temp_linesize = picture.linesize[1];
+        picture.data[1] = picture.data[2];
+        picture.linesize[1] = picture.linesize[2];
+        picture.data[2] = temp_data;
+        picture.linesize[2] = temp_linesize;
+    }
+    if (codec->decoder_vflip)
+        if (x264vfw_picture_vflip(&picture, codec->decoder_pix_fmt, inhdr->biWidth, inhdr->biHeight) < 0)
+        {
+            DPRINTF("x264vfw_picture_vflip failed\n");
+            return ICERR_ERROR;
+        }
+
+    if (!codec->sws)
+    {
+        codec->sws = x264vfw_init_sws_context(codec, inhdr->biWidth, inhdr->biHeight);
+        if (!codec->sws)
+        {
+            DPRINTF("x264vfw_init_sws_context failed\n");
+            return ICERR_ERROR;
+        }
+    }
+
+    sws_scale(codec->sws, (const uint8_t * const *)codec->decoder_frame->data, codec->decoder_frame->linesize, 0, inhdr->biHeight, picture.data, picture.linesize);
+    //icd->lpbiDst->biSizeImage = picture_size;
+
+    return ICERR_OK;
+}
+
 LRESULT x264vfw_decompress_end(CODEC *codec)
 {
     codec->decoder_is_avc = 0;

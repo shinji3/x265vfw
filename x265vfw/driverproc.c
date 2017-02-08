@@ -201,7 +201,7 @@ LRESULT WINAPI attribute_align_arg DriverProc(DWORD_PTR dwDriverId, HDRVR hDrive
             return x264vfw_decompress_begin(codec, (BITMAPINFO *)px->lpbiSrc, (BITMAPINFO *)px->lpbiDst);
 
         case ICM_DECOMPRESSEX:
-            return x264vfw_decompress(codec, (ICDECOMPRESS *)lParam1);
+            return x264vfw_decompress_ex(codec, (ICDECOMPRESSEX *)lParam1);
 
         case ICM_DECOMPRESSEX_END:
             return x264vfw_decompress_end(codec);
